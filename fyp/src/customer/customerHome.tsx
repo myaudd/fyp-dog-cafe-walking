@@ -91,7 +91,7 @@ const customerHome = () => {
         <button
           type="button"
           className="profile-icon"
-          onClick={() => navigate("/customerProfile")}
+          onClick={() => navigate("/customer/customerProfile")}
           aria-label="Profile"
         >
           👤

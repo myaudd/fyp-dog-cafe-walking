@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import Login from "./login";
 import Register from "./register";
 import CustomerHome from "./customer/customerHome";
+import CustomerProfile from "./customer/customerProfile";
 
 const Home = () => {
   const navigate = useNavigate();
