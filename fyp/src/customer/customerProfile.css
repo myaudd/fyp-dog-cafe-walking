@@ -10,48 +10,15 @@
   margin-top: 40px;
 }
 
-.image-section {
-  margin-bottom: 30px;
-}
-
-.profile-image {
-  width: 180px;
-  height: 180px;
-  background: #ddd;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: auto;
-  font-size: 60px;
-  overflow: hidden;
-}
-
-.profile-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.image-btn {
-  display: inline-block;
-  margin-top: 10px;
-  margin-bottom: 15px;
-  background: #ccc;
-  padding: 8px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  align-self: center;
-}
-
-.form-section {
+.form-group {
   text-align: left;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-row {
   display: flex;
   flex-direction: row;
-  /* height: 34px; */
   align-items: center;
   margin-bottom: 20px;
 }
@@ -70,62 +37,14 @@
   flex: 1;
   padding: 8px;
   border-radius: 8px;
-  /* height: 34px; */
   border: none;
   background: #ddd;
 }
-
-.form-row button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  background: #ddd;
-  cursor: pointer;
-  margin-right: 8px;
-}
-
-.form-row button.active {
-  background: #999;
-  color: white;
-}
-
-/* .phone-input {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 5px;
-} */
-
-/* .phone-input span {
-  background: #ddd;
-  padding: 8px;
-  border-radius: 8px;
-} */
-
-/* .gender-options {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-} */
-
-/* .gender-options button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  background: #ddd;
-  cursor: pointer;
-} */
-
-/* .gender-options.active {
-  background: #999;
-  color: white;
-} */
 
 .button-group {
   margin-top: 30px;
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
   align-self: center;
   gap: 8px;
 }

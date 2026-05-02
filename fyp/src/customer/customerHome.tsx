@@ -87,7 +87,7 @@ const customerHome = () => {
   return (
     <div className="home-container">
 
-      <header className="site-header">
+      <header className="home-header">
         <button
           type="button"
           className="profile-icon"
@@ -105,7 +105,7 @@ const customerHome = () => {
         <button>Walking record</button>
       </div>
 
-      <div className="search-sort">
+      <div className="search-bar">
         <input
           type="text"
           placeholder="Search dog..."

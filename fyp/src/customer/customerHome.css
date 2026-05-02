@@ -1,9 +1,4 @@
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  
-  .home-container {
+    .home-container {
     padding: 20px;
     min-height: 100vh;
     box-sizing: border-box;
@@ -11,7 +6,7 @@ body {
     flex-direction: column;
   }
 
-  .site-header {
+  .home-header {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -59,7 +54,7 @@ body {
     border-radius: 0px;
   }
   
-  .search-sort {
+  .search-bar {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -68,7 +63,7 @@ body {
     padding-bottom: 20px;
   }
   
-  .search-sort input {
+  .search-bar input {
     width: 450px;
     height: 34px;
     padding: 0 14px;
