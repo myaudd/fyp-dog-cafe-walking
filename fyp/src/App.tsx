@@ -4,6 +4,8 @@ import Login from "./login";
 import Register from "./register";
 import CustomerHome from "./customer/customerHome";
 import CustomerProfile from "./customer/customerProfile";
+import ResidentDogProfile from "./customer/residentDogProfile";
+import BookResidentDog from "./customer/bookResidentDog";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -34,6 +36,8 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/customer/customerHome" element={<CustomerHome />} />
       <Route path="/customer/customerProfile" element={<CustomerProfile />} />
+      <Route path="/dog/:dogId" element={<ResidentDogProfile />} />
+      <Route path="/bookResidentDog/:dogId" element={<BookResidentDog />} />
     </Routes>
   );
 }

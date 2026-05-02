@@ -6,7 +6,7 @@ import "./customerHome.css";
 type Dog = {
   residentdogid: string;
   residentdogname: string;
-  residentdoggender: string;
+  // residentdoggender: string;
   residentdogbreed: string;
   residentdogsize: string;
 };
@@ -81,7 +81,7 @@ const customerHome = () => {
   };
 
   const goToDog = (id: string) => {
-    window.location.href = `/dog/${id}`;
+    navigate(`/dog/${id}`);
   };
 
   return (
@@ -145,13 +145,13 @@ const customerHome = () => {
               <div className="dog-info">
                 <div className="label">
                   <p>Name</p>
-                  <p>Gender</p>
-                  <p>Breed / Size</p>
+                  {/* <p>Gender</p> */}
+                  <p>Breed</p>
                 </div>
 
                 <div className="value">
                   <p>{dog.residentdogname}</p>
-                  <p>{dog.residentdoggender}</p>
+                  {/* <p>{dog.residentdoggender}</p> */}
                   <p>{dog.residentdogbreed}</p>
                 </div>
               </div>
