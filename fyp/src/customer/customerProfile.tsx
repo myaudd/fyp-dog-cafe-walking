@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import "./customerProfile.css";
 
 const CustomerProfile = () => {
+  const navigate = useNavigate();
   const [customerID, setCustomerID] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -95,6 +97,7 @@ const CustomerProfile = () => {
     }
 
     alert("Profile deleted");
+    navigate("/");
   };
 
   return (

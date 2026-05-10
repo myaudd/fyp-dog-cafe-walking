@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "./supabaseClient";
 import "./register.css";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,6 +46,7 @@ const Register = () => {
       }
       
       alert("Registration successful!");
+      navigate("/");
     } catch (err) {
       setError("Something went wrong.");
     }

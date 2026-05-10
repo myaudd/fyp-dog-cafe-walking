@@ -47,7 +47,7 @@ const customerHome = () => {
     M: 2,
     L: 3
   };
-  
+
   const filteredDogs = dogs
     .filter(dog =>
       dog.residentdogname.toLowerCase().includes(search.toLowerCase())
@@ -99,10 +99,16 @@ const customerHome = () => {
       </header>
 
       <div className="menu-bar">
-        <button className="active">Available dog</button>
-        <button>Book for your dog</button>
-        <button>Booking record</button>
-        <button>Walking record</button>
+        <button 
+          className="active"
+          onClick={() => navigate(`/customer/customerHome`)}
+        >
+          Available dog
+        </button>
+
+        <button onClick={() => navigate(`/customer/availableStaff`)}>Book for your dog</button>
+        <button onClick={() => navigate(`/customer/bookingRecord`)}>Booking record</button>
+        <button onClick={() => navigate(`/customer/walkingRecord`)}>Walking record</button>
       </div>
 
       <div className="search-bar">
@@ -145,14 +151,14 @@ const customerHome = () => {
               <div className="dog-info">
                 <div className="label">
                   <p>Name</p>
-                  {/* <p>Gender</p> */}
                   <p>Breed</p>
+                  <p>Size</p>
                 </div>
 
                 <div className="value">
                   <p>{dog.residentdogname}</p>
-                  {/* <p>{dog.residentdoggender}</p> */}
                   <p>{dog.residentdogbreed}</p>
+                  <p>{dog.residentdogsize}</p>
                 </div>
               </div>
 

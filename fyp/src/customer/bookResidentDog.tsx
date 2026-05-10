@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
+//import "./bookResidentDog.css";
 
 type Dog = {
   residentdogid: string;
@@ -78,7 +79,7 @@ const BookResidentDog = () => {
       <h1>Book a Time</h1>
 
       {dog && (
-        <p>Booking for: {dog.residentdogname}</p>
+        <p>Booking for: {dog.residentdogname}</p> //display the text after the dog is loaded from db
       )}
 
       <label>Select Date & Time:</label>
