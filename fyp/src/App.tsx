@@ -8,6 +8,8 @@ import ResidentDogProfile from "./customer/residentDogProfile";
 import BookResidentDog from "./customer/bookResidentDog";
 import AvailableStaff from "./customer/availableStaff";
 import BookStaff from "./customer/bookStaff";
+import CustomerBookingRecord from "./customer/customerBookingRecord";
+import CustomerWalkingRecord from "./customer/customerWalkingRecord";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -42,8 +44,8 @@ function App() {
       <Route path="/bookResidentDog/:dogId" element={<BookResidentDog />} />
       <Route path="/customer/availableStaff" element={<AvailableStaff />} />
       <Route path="/bookStaff/:staffId" element={<BookStaff />} />
-      {/* <Route path="/customer/bookingRecord" element={<CustomerBookingRecord />} />
-      <Route path="/customer/walkingRecord" element={<CustomerWalkingRecord />} /> */}
+      <Route path="/customer/bookingRecord" element={<CustomerBookingRecord />} />
+      <Route path="/customer/walkingRecord" element={<CustomerWalkingRecord />} />
     </Routes>
   );
 }

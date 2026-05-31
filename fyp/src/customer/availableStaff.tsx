@@ -11,7 +11,7 @@ type Staff = {
 
 const availableStaff = () => {
     const navigate = useNavigate();
-    const [staffs, setStaffs] = useState<Staff[]>([]);
+    const [staffs, setStaffs] = useState<Staff[]>([]); //current value, function to update the value, update ui automatically
     const [roles, setRoles] = useState<string[]>([]);
     const [search, setSearch] = useState("");
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
@@ -26,7 +26,7 @@ const availableStaff = () => {
                 setStaffs(data);
 
             const uniqueRoles = [
-                ...new Set(
+                ...new Set( //set only store unique value and ... move items in set into array
                     data
                         .map(s => s.staffrole)
                         .filter(role => role && role.trim() !== "")
@@ -36,7 +36,7 @@ const availableStaff = () => {
             }
         };
         fetchStaffs();
-    }, []);
+    }, []); //function and dependency array, empty = run once only
 
     const filteredStaffs = staffs
         .filter(staff =>
@@ -50,8 +50,8 @@ const availableStaff = () => {
     const toggleRole = (role: string) => {
         setSelectedRoles(prev =>
             prev.includes(role)
-                ? prev.filter(r => r !== role)
-                : [...prev, role]
+                ? prev.filter(r => r !== role) //remove
+                : [...prev, role] //add
         );
     };
 
@@ -91,7 +91,7 @@ const availableStaff = () => {
                     type="text"
                     placeholder="Search staff..."
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => setSearch(e.target.value)} //target -> search bar
                 />
             </div>
 
@@ -99,9 +99,9 @@ const availableStaff = () => {
                 <div className="filter">
                     <p>Filter by role</p>
 
-                    {roles.map(role => (
+                    {roles.map(role => (  //generate list
                         <button
-                            key={role}
+                            key={role} //unique purpose
                             className={selectedRoles.includes(role) ? "active" : ""}
                             onClick={() => toggleRole(role)}
                         >
@@ -112,7 +112,11 @@ const availableStaff = () => {
 
                 <div className="staff-grid">
                     {filteredStaffs.map(staff => (
-                        <div key={staff.staffid} className="staff-card" onClick={() => goToBook(staff.staffid)}>
+                        <div 
+                            key={staff.staffid} 
+                            className="staff-card" 
+                            onClick={() => goToBook(staff.staffid)}
+                        >
 
                             <div className="staff-image">👤</div>
 

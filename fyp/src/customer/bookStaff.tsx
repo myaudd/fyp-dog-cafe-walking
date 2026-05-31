@@ -14,6 +14,7 @@ const BookStaff = () => {
 
     const [staff, setStaff] = useState<Staff | null>(null);
     const [selectedTime, setSelectedTime] = useState("");
+    const [place, setPlace] = useState("");
     const [customerID, setCustomerID] = useState("");
 
     useEffect(() => {
@@ -50,6 +51,11 @@ const BookStaff = () => {
             return;
         }
 
+        if (!place) {
+            alert("Please enter a location");
+            return;
+        }
+
         if (!customerID || !staffId) {
             alert("Missing booking info");
             return;
@@ -62,6 +68,7 @@ const BookStaff = () => {
                     customerid: customerID,
                     staffid: staffId,
                     bsdatetime: selectedTime,
+                    bsplace: place,
                 },
             ]);
         
@@ -87,6 +94,13 @@ const BookStaff = () => {
                 type="datetime-local"
                 value={selectedTime}
                 onChange={(e) => setSelectedTime(e.target.value)}
+            />
+
+            <label>Enter location</label>
+            <input
+                type="text"
+                value={place}
+                onChange={(e) => setPlace(e.target.value)}
             />
 
             <button onClick={handleConfirm} >

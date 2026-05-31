@@ -14,6 +14,7 @@ const BookResidentDog = () => {
 
   const [dog, setDog] = useState<Dog | null>(null);
   const [selectedTime, setSelectedTime] = useState("");
+  const [place, setPlace] = useState("");
   const [customerID, setCustomerID] = useState("");
 
   useEffect(() => {
@@ -50,6 +51,11 @@ const BookResidentDog = () => {
       return;
     }
 
+    if (!place) {
+      alert("Please enter a location");
+      return;
+    }
+
     if (!customerID || !dogId) {
       alert("Missing booking info");
       return;
@@ -62,6 +68,7 @@ const BookResidentDog = () => {
           customerid: customerID,
           residentdogid: dogId,
           brddatetime: selectedTime,
+          brdplace: place,
         },
       ]);
 
@@ -87,6 +94,13 @@ const BookResidentDog = () => {
         type="datetime-local"
         value={selectedTime}
         onChange={(e) => setSelectedTime(e.target.value)}
+      />
+
+      <label>Enter location:</label>
+      <input
+        type="text"
+        value={place}
+        onChange={(e) => setPlace(e.target.value)}
       />
 
       <button onClick={handleConfirm} >
