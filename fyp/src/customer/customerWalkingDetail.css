@@ -1,0 +1,46 @@
+.container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.photo-section {
+    margin-top: 20px;
+}
+
+.photo-grid {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.photo-card {
+    width: 150px;
+}
+
+.photo-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.photo-desc {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.rating-section {
+    margin-top: 20px;
+}
+
+.star-btn {
+    font-size: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.star-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}

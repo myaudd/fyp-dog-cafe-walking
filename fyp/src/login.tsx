@@ -22,7 +22,7 @@ const Login = () => {
         .from("customer")
         .select("*")
         .eq("customername", username)
-        .maybeSingle();
+        .maybeSingle(); //expect 0 or 1 row
   
       if(customer) {
         if (customer.customerpassword !== password) {
@@ -35,7 +35,7 @@ const Login = () => {
           data: customer
         };
 
-        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("user", JSON.stringify(user)); //key, value: json to convert obj to string to store browser local
 
         alert("Customer log in successful!");
 

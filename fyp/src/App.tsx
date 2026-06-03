@@ -10,6 +10,7 @@ import AvailableStaff from "./customer/availableStaff";
 import BookStaff from "./customer/bookStaff";
 import CustomerBookingRecord from "./customer/customerBookingRecord";
 import CustomerWalkingRecord from "./customer/customerWalkingRecord";
+import CustomerWalkingDetail from "./customer/customerWalkingDetail";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ function App() {
       <Route path="/bookStaff/:staffId" element={<BookStaff />} />
       <Route path="/customer/bookingRecord" element={<CustomerBookingRecord />} />
       <Route path="/customer/walkingRecord" element={<CustomerWalkingRecord />} />
+      <Route path="/walk/:type/:id" element={<CustomerWalkingDetail />} />
     </Routes>
   );
 }

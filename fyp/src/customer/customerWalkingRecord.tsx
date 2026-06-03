@@ -13,8 +13,8 @@ type Walking = {
     subjectname: string;
     walkingdatetime: string;
     walkingduration: string;
-    walkingphoto: string | null;
-    walkingrating: number | null;
+    // walkingphoto: string | null;
+    // walkingrating: number | null;
 };
 
 const CustomerWalkingRecord = () => {
@@ -80,8 +80,8 @@ const CustomerWalkingRecord = () => {
                         subjectname: row.residentdog?.residentdogname ?? "Unknown",
                         walkingdatetime: row.brddatetime,
                         walkingduration: row.brdduration,
-                        walkingphoto: row.photo?.photourl ?? null,
-                        walkingrating: null,
+                        // walkingphoto: row.photo?.photourl ?? null,
+                        // walkingrating: null,
                     });
                 });   
             }
@@ -96,8 +96,8 @@ const CustomerWalkingRecord = () => {
                         subjectname: row.staff?.staffname ?? "Unknown",
                         walkingdatetime: row.bsdatetime,
                         walkingduration: row.bsduration,
-                        walkingphoto: null,
-                        walkingrating: row.bsrate ?? null,
+                        // walkingphoto: null,
+                        // walkingrating: row.bsrate ?? null,
                     });
                 });
             }
@@ -151,6 +151,10 @@ const CustomerWalkingRecord = () => {
         }
         return duration.length > 0 ? duration.join(" ") : "0 minutes";
     }
+
+    const goToWalking = (id: string, type: WalkingType) => {
+        navigate(`/walk/${type}/${id}`);
+    };
 
     return (
         <div className="container">
@@ -211,7 +215,7 @@ const CustomerWalkingRecord = () => {
                     )}
 
                     {filteredWalkings.map(walkings => (
-                        <div key={walkings.walkingid} className="walking-card">
+                        <div key={walkings.walkingid} className="walking-card" onClick={() => goToWalking(walkings.walkingid, walkings.walkingtype)}>
                             <div className="walking-info">
                                 <div className="label">
                                     <p>Type</p>
