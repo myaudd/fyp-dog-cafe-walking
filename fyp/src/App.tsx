@@ -13,6 +13,7 @@ import CustomerWalkingRecord from "./customer/customerWalkingRecord";
 import CustomerWalkingDetail from "./customer/customerWalkingDetail";
 import StaffHome from "./staff/staffHome";
 import StaffAssignedTimer from "./staff/staffAssignedTimer";
+import StaffProfile from "./staff/staffProfile";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ function App() {
       <Route path="/walk/:type/:id" element={<CustomerWalkingDetail />} />
       <Route path="/staff/staffHome" element={<StaffHome />} />
       <Route path="/timer/:id" element={<StaffAssignedTimer />} />
+      <Route path="/staff/staffProfile" element={<StaffProfile />} />
     </Routes>
   );
 }
