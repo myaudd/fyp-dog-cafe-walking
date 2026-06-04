@@ -11,6 +11,8 @@ import BookStaff from "./customer/bookStaff";
 import CustomerBookingRecord from "./customer/customerBookingRecord";
 import CustomerWalkingRecord from "./customer/customerWalkingRecord";
 import CustomerWalkingDetail from "./customer/customerWalkingDetail";
+import StaffHome from "./staff/staffHome";
+import StaffAssignedTimer from "./staff/staffAssignedTimer";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -48,6 +50,8 @@ function App() {
       <Route path="/customer/bookingRecord" element={<CustomerBookingRecord />} />
       <Route path="/customer/walkingRecord" element={<CustomerWalkingRecord />} />
       <Route path="/walk/:type/:id" element={<CustomerWalkingDetail />} />
+      <Route path="/staff/staffHome" element={<StaffHome />} />
+      <Route path="/timer/:id" element={<StaffAssignedTimer />} />
     </Routes>
   );
 }

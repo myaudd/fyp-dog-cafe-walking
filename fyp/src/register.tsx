@@ -28,13 +28,15 @@ const Register = () => {
     }
 
     try {
-      const { error } = await supabase.from("customer").insert([
-        {
-          customername: username,
-          customeremail: email,
-          customerpassword: password,
-        },
-      ]);
+      const { error } = await supabase
+        .from("customer")
+        .insert([
+          {
+            customername: username,
+            customeremail: email,
+            customerpassword: password,
+          },
+        ]); //an array with one object (row)
 
       if (error) {
         if (error.message.includes("customername")) {
