@@ -93,8 +93,8 @@ const StaffHome = () => {
         });
     };
 
-    const goToTimer = (id: string) => {
-        navigate(`/timer/${id}`);
+    const goToTimer = (id: string, type: "bookingstaff") => {
+        navigate(`/timer/${type}/${id}`);
     };
 
     return (
@@ -145,7 +145,7 @@ const StaffHome = () => {
                     )}
 
                     {filteredBookings.map(bookings => (
-                        <div key={bookings.bookingid} className="booking-card" onClick={() => goToTimer(bookings.bookingid)}>
+                        <div key={bookings.bookingid} className="booking-card" onClick={() => goToTimer(bookings.bookingid, "bookingstaff")}>
                             <div className="detail">
                                 <p>Customer name: {bookings.customername}</p>
                                 <p>Date & time: {formatDateTime(bookings.bookingdatetime)}</p>

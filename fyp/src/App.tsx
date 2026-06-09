@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom"; //to navigate user between pages
 import './App.css'
 import Login from "./login";
 import Register from "./register";
@@ -14,6 +14,7 @@ import CustomerWalkingDetail from "./customer/customerWalkingDetail";
 import StaffHome from "./staff/staffHome";
 import StaffAssignedTimer from "./staff/staffAssignedTimer";
 import StaffProfile from "./staff/staffProfile";
+import StaffManageBooking from "./staff/staffManageBooking";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ const Home = () => {
 function App() {
   return (
     <Routes>
+      {/* browser url, display element */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -47,13 +49,15 @@ function App() {
       <Route path="/dog/:dogId" element={<ResidentDogProfile />} />
       <Route path="/bookResidentDog/:dogId" element={<BookResidentDog />} />
       <Route path="/customer/availableStaff" element={<AvailableStaff />} />
+      {/* /:..../ -> a variable / parameter */}
       <Route path="/bookStaff/:staffId" element={<BookStaff />} />
       <Route path="/customer/bookingRecord" element={<CustomerBookingRecord />} />
       <Route path="/customer/walkingRecord" element={<CustomerWalkingRecord />} />
       <Route path="/walk/:type/:id" element={<CustomerWalkingDetail />} />
       <Route path="/staff/staffHome" element={<StaffHome />} />
-      <Route path="/timer/:id" element={<StaffAssignedTimer />} />
+      <Route path="/timer/:type/:id" element={<StaffAssignedTimer />} />
       <Route path="/staff/staffProfile" element={<StaffProfile />} />
+      <Route path="/staff/staffManageBooking" element={<StaffManageBooking />} />
     </Routes>
   );
 }
