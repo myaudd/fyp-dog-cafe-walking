@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 
 type BookingType = "residentdog" | "staff";
@@ -22,10 +22,8 @@ const StaffAssignedTimer = () => {
     const { type, id } = useParams(); 
     const [booking, setBooking] = useState<Booking | null>(null);
 
-    const [running, setRunning] = useState(false);
-    const [locked, setLocked] = useState(false); 
-    const [seconds, setSeconds] = useState(0);
-    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null); //creates a mutable object whose value persists between re-renders
+    const [walking, setWalking] = useState(false);
+    const [completed, setCompleted] = useState(false); 
 
     useEffect(() => {
         const fetchData = async () => {
@@ -131,9 +129,9 @@ const StaffAssignedTimer = () => {
         );
     };
 
-    const handleTimer = async () => {
-        if (!running && !locked) {
-            setRunning(true);
+    const handleWalk = async () => {
+        if (!walking && !completed) {
+            setWalking(true);
             if (type === "residentdog") {
                 await supabase
                 .from("bookingresidentdog")
@@ -145,48 +143,22 @@ const StaffAssignedTimer = () => {
                 .update({ bswalkstarttime: walkTimestamp()})
                 .eq("bsid", id);
             }
-
-            intervalRef.current = setInterval(() => {
-                setSeconds(prev => prev + 1);
-            }, 1000); //1000 milliseconds = 1 seconds, function, time interval
-        } else if (running && !locked) {
-            setRunning(false);
-            setLocked(true); // cannot restart anymore
-
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current); //stop the timer
-            }
+        } else if (walking && !completed) {
+            setWalking(false);
+            setCompleted(true); // cannot restart anymore
 
             if (type === "residentdog") {
                 await supabase
                 .from("bookingresidentdog")
-                .update({ brdwalkstarttime: walkTimestamp()})
+                .update({ brdwalkendtime: walkTimestamp()})
                 .eq("brdid", id);
             } else {
                 await supabase
                 .from("bookingstaff")
-                .update({ bswalkstarttime: walkTimestamp()})
+                .update({ bswalkendtime: walkTimestamp()})
                 .eq("bsid", id);
             }
         }
-    };
-
-    useEffect(() => { //When this page/component is closed or removed, stop the timer if it’s still running.
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
-        };
-    }, []);
-
-    const formatTimer = (total: number) => {
-        const hrs = Math.floor(total / 3600);
-        const mins = Math.floor((total % 3600) / 60); //math.floor: rounds a number down to the nearest whole number
-        const secs = total % 60;
-
-        return `${hrs.toString().padStart(2, "0")}:
-                ${mins.toString().padStart(2, "0")}:
-                ${secs.toString().padStart(2, "0")}`;
     };
 
     const formatDateTime = (dt?: string) => {
@@ -202,15 +174,13 @@ const StaffAssignedTimer = () => {
 
     return (
         <div className="container">
-            <h2>Timer: {formatTimer(seconds)}</h2>
-
             <button
-                onClick={handleTimer}
-                disabled={locked}
+                onClick={handleWalk}
+                disabled={completed}
             >
-                {!running && !locked && "Start Timer"}
-                {running && "End Timer"}
-                {locked && "Session Completed"}
+                {!walking && !completed && "Start Walking"}
+                {walking && "End Walking"}
+                {completed && "Session Completed"}
             </button>
 
             {type === "residentdog" && (
