@@ -4,6 +4,8 @@ import { supabase } from "../supabaseClient";
 // import "./customerWalkingRecord.css";
 
 type WalkingType = "residentdog" | "staff";
+type WalkingStatus = "Completed" | "Rejected" | "Invalid";
+
 
 type Walking = {
     walkingid: string;
@@ -13,15 +15,19 @@ type Walking = {
     subjectname: string;
     walkingdatetime: string;
     walkingduration: string;
+    walkingstatus: string;
     // walkingphoto: string | null;
     // walkingrating: number | null;
 };
+
+const statuses: WalkingStatus[] = ["Completed", "Rejected", "Invalid"];
 
 const CustomerWalkingRecord = () => {
     const navigate = useNavigate();
     const [walkings, setWalkings] = useState<Walking[]>([]);
     const [sort, setSort] = useState<"desc" | "asc">("desc");
     const [selectedTypes, setSelectedTypes] = useState<WalkingType[]>([]);
+    const [selectedStatuses, setSelectedStatuses] = useState<WalkingStatus[]>([]);
 
     useEffect(() => {
         const fetchWalkings = async () => {
@@ -46,11 +52,11 @@ const CustomerWalkingRecord = () => {
                         residentdog (
                             residentdogid,
                             residentdogname
-                        )
+                        ),
+                        brdstatus
                     `)
                     .eq("customerid", customer.customerid)
-                    .not("brdduration", "is", null)
-                    .gt("brdduration", 0),
+                    .in("brdstatus", ["Completed", "Rejected", "Invalid"]),
                 supabase
                     .from("bookingstaff")
                     .select(`
@@ -61,11 +67,11 @@ const CustomerWalkingRecord = () => {
                         staff (
                             staffid,
                             staffname
-                        )
+                        ),
+                        bsstatus
                     `)
                     .eq("customerid", customer.customerid)
-                    .not("bsduration", "is", null)
-                    .gt("bsduration", 0),
+                    .in("bsstatus", ["Completed", "Rejected", "Invalid"]),
             ]);
 
             const combinedWalking: Walking[] = [];
@@ -82,6 +88,7 @@ const CustomerWalkingRecord = () => {
                         walkingduration: row.brdduration,
                         // walkingphoto: row.photo?.photourl ?? null,
                         // walkingrating: null,
+                        walkingstatus: row.brdstatus,
                     });
                 });   
             }
@@ -98,6 +105,7 @@ const CustomerWalkingRecord = () => {
                         walkingduration: row.bsduration,
                         // walkingphoto: null,
                         // walkingrating: row.bsrate ?? null,
+                        walkingstatus: row.bsstatus,
                     });
                 });
             }
@@ -118,9 +126,18 @@ const CustomerWalkingRecord = () => {
         );
     };
 
+    const toggleStatus = (status: WalkingStatus) => {
+        setSelectedStatuses(prev =>
+            prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
+        );
+    };
+
     const filteredWalkings = walkings
         .filter(w =>
             selectedTypes.length === 0 || selectedTypes.includes(w.walkingtype)
+        )
+        .filter(w =>
+            selectedStatuses.length === 0 || selectedStatuses.includes(w.walkingstatus as WalkingStatus)
         )
         .sort((a, d) => {
             const da = new Date(a.walkingdatetime).getTime();
@@ -207,6 +224,17 @@ const CustomerWalkingRecord = () => {
                     >
                         Staff
                     </button>
+
+                    <p>Booking status</p>
+                    {statuses.map(status => (
+                        <button
+                            key={status}
+                            className={selectedStatuses.includes(status) ? "active" : ""}
+                            onClick={() => toggleStatus(status)}
+                        >
+                            {status}
+                        </button>
+                    ))}
                 </div>
 
                 <div className="walking-list">
@@ -221,14 +249,20 @@ const CustomerWalkingRecord = () => {
                                     <p>Type</p>
                                     <p>Name</p>
                                     <p>Date &amp; Time</p>
-                                    <p>Duration</p>
+                                    {walkings.walkingstatus === "Completed" && (
+                                        <p>Duration</p>
+                                    )}
+                                    <p>Status</p>
                                 </div>
 
                                 <div className="value">
                                     <p>{walkings.walkingtype === "residentdog" ? "Resident Dog" : "Staff"}</p>
                                     <p>{walkings.subjectname}</p>
                                     <p>{formatDateTime(walkings.walkingdatetime)}</p>
-                                    <p>{formatDuration(walkings.walkingduration)}</p>
+                                    {walkings.walkingstatus === "Completed" && (
+                                        <p>{formatDuration(walkings.walkingduration)}</p>
+                                    )}
+                                    <p>{walkings.walkingstatus}</p>
                                 </div>
                             </div>
 
