@@ -4,7 +4,7 @@ import { supabase } from "../supabaseClient";
 // import "./customerBookingRecord.css";
 
 type BookingType = "residentdog" | "staff";
-type BookingStatus = "Approved" | "Pending" | "Rejected" | "Invalid";
+type BookingStatus = "Approved" | "Pending";
 
 type Booking = {
     bookingid: string;
@@ -16,7 +16,7 @@ type Booking = {
     bookingstatus: string;
 };
 
-const statuses: BookingStatus[] = ["Approved", "Pending", "Rejected", "Invalid"];
+const statuses: BookingStatus[] = ["Approved", "Pending"];
 
 const CustomerBookingRecord = () => {
     const navigate = useNavigate();
@@ -53,7 +53,8 @@ const CustomerBookingRecord = () => {
                             residentdogname
                         )
                     `)
-                    .eq("customerid", customer.customerid),
+                    .eq("customerid", customer.customerid)
+                    .in("brdstatus", ["Approved", "Pending"]),
                 supabase
                     .from("bookingstaff")
                     .select(`
@@ -66,7 +67,8 @@ const CustomerBookingRecord = () => {
                             staffname
                         )
                     `)
-                    .eq("customerid", customer.customerid),
+                    .eq("customerid", customer.customerid)
+                    .in("bsstatus", ["Approved", "Pending"]),
             ]);
 
             const combinedBooking: Booking[] = [];
@@ -150,8 +152,6 @@ const CustomerBookingRecord = () => {
         switch (bookingstatus?.toLowerCase()) {
             case "approved": return "status-approved";
             case "pending": return "status-pending";
-            case "rejected": return "status-rejected";
-            case "invalid": return "status-invalid";
             default: return "";
         }
     };
