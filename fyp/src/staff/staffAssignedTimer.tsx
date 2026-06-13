@@ -30,7 +30,7 @@ const StaffAssignedTimer = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (!id) return;
-            if (type === "bookingstaff") {
+            if (type === "staff") {
                 const { data, error } = await supabase
                     .from("bookingstaff")
                     .select(`
@@ -75,7 +75,7 @@ const StaffAssignedTimer = () => {
                     walkendtime: data.bswalkendtime
                 })
             } 
-            if (type === "bookingresidentdog") {
+            if (type === "residentdog") {
                 const { data, error } = await supabase
                     .from("bookingresidentdog")
                     .select(`
