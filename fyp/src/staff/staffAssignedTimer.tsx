@@ -15,6 +15,8 @@ type Booking = {
     residentdogname: string | null;
     bookingdatetime: string;
     bookingplace: string;
+    walkstarttime: string | null;
+    walkendtime: string | null;
 };
 
 const StaffAssignedTimer = () => {
@@ -42,7 +44,9 @@ const StaffAssignedTimer = () => {
                             staffname
                         ),
                         bsdatetime,
-                        bsplace
+                        bsplace,
+                        bswalkstarttime,
+                        bswalkendtime
                     `)
                     .eq("bsid", id)
                     .single();
@@ -66,7 +70,9 @@ const StaffAssignedTimer = () => {
                     residentdogid: null,
                     residentdogname: null,                
                     bookingdatetime: data.bsdatetime,
-                    bookingplace: data.bsplace
+                    bookingplace: data.bsplace,
+                    walkstarttime: data.bswalkstarttime,
+                    walkendtime: data.bswalkendtime
                 })
             } 
             if (type === "bookingresidentdog") {
@@ -83,7 +89,9 @@ const StaffAssignedTimer = () => {
                             residentdogname
                         ),
                         brddatetime,
-                        brdplace
+                        brdplace,
+                        brdwalkstarttime,
+                        brdwalkendtime
                     `)
                     .eq("brdid", id)
                     .single();
@@ -107,12 +115,29 @@ const StaffAssignedTimer = () => {
                     residentdogid: dog.residentdogid,
                     residentdogname: dog.residentdogname,                
                     bookingdatetime: data.brddatetime,
-                    bookingplace: data.brdplace
+                    bookingplace: data.brdplace,
+                    walkstarttime: data.brdwalkstarttime,
+                    walkendtime: data.brdwalkendtime
                 })
             }
         };
         fetchData();
     }, [type, id]);
+
+    useEffect(() => {
+        if (!booking) return;
+
+        if(booking.walkstarttime && !booking.walkendtime) {
+            setWalking(true);
+            setCompleted(false);
+        } else if (booking.walkstarttime && booking.walkendtime) {
+            setWalking(false);
+            setCompleted(true);
+        } else {
+            setWalking(false);
+            setCompleted(false);
+        }
+    }, [booking]);
 
     const walkTimestamp = () => {
         const now = new Date();
