@@ -160,12 +160,18 @@ const StaffAssignedTimer = () => {
             if (type === "residentdog") {
                 await supabase
                 .from("bookingresidentdog")
-                .update({ brdwalkstarttime: walkTimestamp()})
+                .update({ 
+                    brdwalkstarttime: walkTimestamp(),
+                    brdstatus: "Walking"
+                })
                 .eq("brdid", id);
             } else {
                 await supabase
                 .from("bookingstaff")
-                .update({ bswalkstarttime: walkTimestamp()})
+                .update({ 
+                    bswalkstarttime: walkTimestamp(),
+                    bsstatus: "Walking"
+                })
                 .eq("bsid", id);
             }
         } else if (walking && !completed) {
@@ -175,12 +181,18 @@ const StaffAssignedTimer = () => {
             if (type === "residentdog") {
                 await supabase
                 .from("bookingresidentdog")
-                .update({ brdwalkendtime: walkTimestamp()})
+                .update({ 
+                    brdwalkendtime: walkTimestamp(),
+                    brdstatus: "Completed"
+                })
                 .eq("brdid", id);
             } else {
                 await supabase
                 .from("bookingstaff")
-                .update({ bswalkendtime: walkTimestamp()})
+                .update({ 
+                    bswalkendtime: walkTimestamp(),
+                    bsstatus: "Completed"
+                })
                 .eq("bsid", id);
             }
         }
