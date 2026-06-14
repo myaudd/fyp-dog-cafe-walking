@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
-// import "./customerBookingRecord.css";
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { useMemo } from "react";
+import "./customerBookingRecord.css";
 
 type BookingType = "residentdog" | "staff";
 type BookingStatus = "Approved" | "Pending";
@@ -17,9 +19,11 @@ type Booking = {
 };
 
 const statuses: BookingStatus[] = ["Approved", "Pending"];
+const columnHelper = createColumnHelper<Booking>();
 
 const CustomerBookingRecord = () => {
     const navigate = useNavigate();
+
     const [bookings, setBookings] = useState<Booking[]>([]);
     // const [loading, setLoading] = useState(true);
     const [sort, setSort] = useState<"desc" | "asc">("desc");
@@ -124,18 +128,20 @@ const CustomerBookingRecord = () => {
         );
     };
     
-    const filteredBookings = bookings
-        .filter(b => 
-            selectedTypes.length === 0 || selectedTypes.includes(b.bookingtype)
-        )
-        .filter(b =>
-            selectedStatuses.length === 0 || selectedStatuses.includes(b.bookingstatus as BookingStatus)
-        )
-        .sort((a, d) => {
-            const da = new Date(a.bookingdatetime).getTime();
-            const dd = new Date(d.bookingdatetime).getTime();
-            return sort === "desc" ? dd - da : da - dd;
-        });
+    const filteredBookings = useMemo(() => {
+        return [...bookings]
+            .filter(b => 
+                selectedTypes.length === 0 || selectedTypes.includes(b.bookingtype)
+            )
+            .filter(b =>
+                selectedStatuses.length === 0 || selectedStatuses.includes(b.bookingstatus as BookingStatus)
+            )
+            .sort((a, d) => {
+                const da = new Date(a.bookingdatetime).getTime();
+                const dd = new Date(d.bookingdatetime).getTime();
+                return sort === "desc" ? dd - da : da - dd;
+            });
+    }, [bookings, selectedTypes, selectedStatuses, sort]);
 
     const formatDateTime = (dt: string) => {
         if (!dt) return "-";
@@ -156,6 +162,43 @@ const CustomerBookingRecord = () => {
             default: return "";
         }
     };
+
+    const columns = useMemo(
+        () => [
+        columnHelper.accessor("bookingtype", {
+            header: "Type",
+            cell: info =>
+                info.getValue() === "residentdog" ? "Resident Dog" : "Staff",
+        }),
+
+        columnHelper.accessor("subjectname", {
+            header: "Name",
+        }),
+
+        columnHelper.accessor("bookingdatetime", {
+            header: "Date & Time",
+            cell: info => formatDateTime(info.getValue()),
+        }),
+
+        columnHelper.accessor("bookingstatus", {
+            header: "Status",
+            cell: info => (
+                <span className={getStatusClass(info.getValue())}>
+                    {info.getValue()}
+                </span>
+            ),
+        }),
+        ],
+    [formatDateTime, getStatusClass]
+    );
+
+    const table = useMemo(() => {
+        return useReactTable({
+            data: filteredBookings,
+            columns,
+            getCoreRowModel: getCoreRowModel(),
+        });
+    }, [filteredBookings, columns]);
 
     return (
         <div className="container">
@@ -221,35 +264,43 @@ const CustomerBookingRecord = () => {
                     ))}
                 </div>
 
-                <div className="booking-list">
-                    {filteredBookings.length === 0 && (
+                <div className="booking-table-container">
+                    {filteredBookings.length === 0 ? (
                         <p>No booking records found.</p>
+                    ) : (
+                        <table className="booking-table">
+                            <thead>
+                                {table.getHeaderGroups().map(headerGroup => (
+                                    <tr key={headerGroup.id}>
+                                        {headerGroup.headers.map(header => (
+                                            <th key={header.id}>
+                                                {flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </thead>
+
+                            <tbody>
+                                {table.getRowModel().rows.map(row => (
+                                    <tr key={row.id}>
+                                        {row.getVisibleCells().map(cell => (
+                                            <td key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     )}
-                    
-                    {filteredBookings.map(bookings => (
-                        <div key={bookings.bookingid} className="booking-card">
-                            <div className="booking-info">
-                                <div className="label">
-                                    <p>Type</p>
-                                    <p>Name</p>
-                                    <p>Date &amp; Time</p>
-                                    <p>Status</p>
-                                </div>
-
-                                <div className="value">
-                                    <p>{bookings.bookingtype === "residentdog" ? "Resident Dog" : "Staff"}</p>
-                                    <p>{bookings.subjectname}</p>
-                                    <p>{formatDateTime(bookings.bookingdatetime)}</p>
-                                    <p className={getStatusClass(bookings.bookingstatus)}>
-                                        {bookings.bookingstatus}
-                                    </p>
-                                </div>
-                            </div>
-
-                        </div>
-                    ))}
-                </div>
-                
+                </div>                
             </div>
         </div>
     );
