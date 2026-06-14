@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react"; //cache computed value, prevent rerendering whole table whenever filteredbooking change
 import { supabase } from "../supabaseClient";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { useMemo } from "react";
+//to define columns, ro render headers and cells correctly, to build basic rows, to create a table instance
 import "./customerBookingRecord.css";
 
 type BookingType = "residentdog" | "staff";
@@ -136,10 +136,10 @@ const CustomerBookingRecord = () => {
             .filter(b =>
                 selectedStatuses.length === 0 || selectedStatuses.includes(b.bookingstatus as BookingStatus)
             )
-            .sort((a, d) => {
+            .sort((a, b) => {
                 const da = new Date(a.bookingdatetime).getTime();
-                const dd = new Date(d.bookingdatetime).getTime();
-                return sort === "desc" ? dd - da : da - dd;
+                const db = new Date(b.bookingdatetime).getTime();
+                return sort === "desc" ? db - da : da - db;
             });
     }, [bookings, selectedTypes, selectedStatuses, sort]);
 
@@ -196,7 +196,7 @@ const CustomerBookingRecord = () => {
         return useReactTable({
             data: filteredBookings,
             columns,
-            getCoreRowModel: getCoreRowModel(),
+            getCoreRowModel: getCoreRowModel(), //get rows from data
         });
     }, [filteredBookings, columns]);
 
@@ -271,11 +271,16 @@ const CustomerBookingRecord = () => {
                         <table className="booking-table">
                             <thead>
                                 {table.getHeaderGroups().map(headerGroup => (
-                                    <tr key={headerGroup.id}>
+                                    // get column headers
+                                    <tr key={headerGroup.id}> 
+                                    {/* table row */}
                                         {headerGroup.headers.map(header => (
+                                            // each column
                                             <th key={header.id}>
+                                                {/* table header */}
                                                 {flexRender(
                                                     header.column.columnDef.header,
+                                                    // get the header definition of this column
                                                     header.getContext()
                                                 )}
                                             </th>
@@ -286,11 +291,15 @@ const CustomerBookingRecord = () => {
 
                             <tbody>
                                 {table.getRowModel().rows.map(row => (
+                                    // all data rows
                                     <tr key={row.id}>
                                         {row.getVisibleCells().map(cell => (
+                                            // cells inside a row
                                             <td key={cell.id}>
+                                                {/* table data cell */}
                                                 {flexRender(
                                                     cell.column.columnDef.cell,
+                                                    // get the function that renders each cell for this column
                                                     cell.getContext()
                                                 )}
                                             </td>

@@ -16,9 +16,9 @@ const availableStaff = () => {
     const [search, setSearch] = useState("");
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 
-    useEffect(() => {
-        const fetchStaffs = async () => {
-            const { data } = await supabase
+    useEffect(() => { //useEffect(function)
+        const fetchStaffs = async () => { //run asynchronously
+            const { data } = await supabase //{} destructuring
                 .from("staff")
                 .select("*");
 
@@ -26,10 +26,10 @@ const availableStaff = () => {
                 setStaffs(data);
 
             const uniqueRoles = [
-                ...new Set( //set only store unique value and ... move items in set into array
+                ...new Set( //set only store unique value and ... convert items in set into array
                     data
                         .map(s => s.staffrole)
-                        .filter(role => role && role.trim() !== "")
+                        .filter(role => role && role.trim() !== "") //ensure not null
                 )
             ];
             setRoles(uniqueRoles);
