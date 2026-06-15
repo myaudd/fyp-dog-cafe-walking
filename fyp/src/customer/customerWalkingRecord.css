@@ -1,0 +1,41 @@
+.walking-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.wlaking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.walking-table th,
+.walking-table td {
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.walking-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+}
+
+.walking-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+.status-completed {
+    color: green;
+    font-weight: bold;
+}
+
+.status-invalid {
+    color: orange;
+    font-weight: bold;
+}
+
+.status-rejected {
+    color: red;
+    font-weight: bold;
+}

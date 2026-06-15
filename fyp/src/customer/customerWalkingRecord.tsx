@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabaseClient";
-// import "./customerWalkingRecord.css";
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import "./customerWalkingRecord.css";
 
 type WalkingType = "residentdog" | "staff";
 type WalkingStatus = "Completed" | "Rejected" | "Invalid";
@@ -21,6 +22,7 @@ type Walking = {
 };
 
 const statuses: WalkingStatus[] = ["Completed", "Rejected", "Invalid"];
+const columnHelper = createColumnHelper<Walking>();
 
 const CustomerWalkingRecord = () => {
     const navigate = useNavigate();
@@ -132,18 +134,20 @@ const CustomerWalkingRecord = () => {
         );
     };
 
-    const filteredWalkings = walkings
-        .filter(w =>
-            selectedTypes.length === 0 || selectedTypes.includes(w.walkingtype)
-        )
-        .filter(w =>
-            selectedStatuses.length === 0 || selectedStatuses.includes(w.walkingstatus as WalkingStatus)
-        )
-        .sort((a, d) => {
-            const da = new Date(a.walkingdatetime).getTime();
-            const dd = new Date(d.walkingdatetime).getTime();
-            return sort === "desc" ? dd - da : da - dd;
-        });
+    const filteredWalkings = useMemo(() => {
+        return [...walkings]
+            .filter(w =>
+                selectedTypes.length === 0 || selectedTypes.includes(w.walkingtype)
+            )
+            .filter(w =>
+                selectedStatuses.length === 0 || selectedStatuses.includes(w.walkingstatus as WalkingStatus)
+            )
+            .sort((a, d) => {
+                const da = new Date(a.walkingdatetime).getTime();
+                const dd = new Date(d.walkingdatetime).getTime();
+                return sort === "desc" ? dd - da : da - dd;
+            });
+    }, [walkings, selectedTypes, selectedStatuses, sort]);
 
     const formatDateTime = (datetime: string) => {
         if (!datetime) return "-";
@@ -168,6 +172,57 @@ const CustomerWalkingRecord = () => {
         }
         return duration.length > 0 ? duration.join(" ") : "0 minutes";
     }
+
+    const getStatusClass = (walkingstatus: string) => {
+        switch (walkingstatus?.toLowerCase()) {
+            case "completed": return "status-approved";
+            case "rejected": return "status-rejected";
+            case "invalid": return "status-invalid";
+            default: return "";
+        }
+    };
+
+    const columns = useMemo(
+        () => [
+        columnHelper.accessor("walkingtype", {
+            header: "Type",
+            cell: info => 
+                info.getValue() === "residentdog" ? "Resident Dog" : "Staff",
+        }),
+
+        columnHelper.accessor("subjectname", {
+            header: "Name",
+        }),
+
+        columnHelper.accessor("walkingdatetime", {
+            header: "Date & Time",
+            cell: info => formatDateTime(info.getValue()),
+        }),
+
+        columnHelper.accessor("walkingstatus", {
+            header: "Status",
+            cell: info => (
+                <span className={getStatusClass(info.getValue())}>
+                    {info.getValue()}
+                </span>
+            ),
+        }),
+
+        columnHelper.accessor("walkingduration", {
+            header: "Duration",
+            cell: info => formatDuration(info.getValue()),
+        }),
+        ],
+    [formatDateTime, formatDuration, getStatusClass]
+    );
+
+    const table = useMemo(() => {
+        return useReactTable({
+            data: filteredWalkings,
+            columns,
+            getCoreRowModel: getCoreRowModel(),
+        });
+    }, [filteredWalkings, columns]);
 
     const goToWalking = (id: string, type: WalkingType) => {
         navigate(`/walk/${type}/${id}`);
@@ -237,7 +292,45 @@ const CustomerWalkingRecord = () => {
                     ))}
                 </div>
 
-                <div className="walking-list">
+                <div className="walking-table-container">
+                    {filteredWalkings.length === 0 ? (
+                        <p>No walking record found.</p>
+                    ) : (
+                        <table className="walking-table">
+                            <thead>
+                                {table.getHeaderGroups().map(headerGroup => (
+                                    <tr key={headerGroup.id}>
+                                        {headerGroup.headers.map(header => (
+                                            <th key={header.id}>
+                                                {flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </thead>
+
+                            <tbody>
+                                {table.getRowModel().rows.map(row => (
+                                    <tr key={row.id}>
+                                        {row.getVisibleCells().map(cell => (
+                                            <td key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+
+                {/* <div className="walking-list">
                     {filteredWalkings.length === 0 && (
                         <p>No walking records found.</p>
                     )}
@@ -268,7 +361,7 @@ const CustomerWalkingRecord = () => {
 
                         </div>
                     ))}
-                </div>
+                </div> */}
 
             </div>
         </div>
