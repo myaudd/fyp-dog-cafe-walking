@@ -1,0 +1,36 @@
+.assigned-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.assigned-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.assigned-table th,
+.assigned-table td {
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.assigned-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+}
+
+.assigned-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+.status-approved {
+    color: green;
+    font-weight: bold;
+}
+
+.status-walking {
+    color: orange;
+    font-weight: bold;
+}

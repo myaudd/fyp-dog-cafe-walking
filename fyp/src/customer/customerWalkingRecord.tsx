@@ -7,7 +7,6 @@ import "./customerWalkingRecord.css";
 type WalkingType = "residentdog" | "staff";
 type WalkingStatus = "Completed" | "Rejected" | "Invalid";
 
-
 type Walking = {
     walkingid: string;
     walkingtype: WalkingType;
@@ -180,15 +179,14 @@ const CustomerWalkingRecord = () => {
 
     const getStatusClass = (walkingstatus: string) => {
         switch (walkingstatus?.toLowerCase()) {
-            case "completed": return "status-approved";
+            case "completed": return "status-completed";
             case "rejected": return "status-rejected";
             case "invalid": return "status-invalid";
             default: return "";
         }
     };
 
-    const columns = useMemo(
-        () => [
+    const columns = useMemo(() => [
         columnHelper.accessor("walkingtype", {
             header: "Type",
             cell: info => 
@@ -217,9 +215,7 @@ const CustomerWalkingRecord = () => {
             header: "Duration",
             cell: info => formatDuration(info.getValue()),
         }),
-        ],
-    [formatDateTime, formatDuration, getStatusClass]
-    );
+    ], [formatDateTime, formatDuration, getStatusClass]);
 
     const table = useMemo(() => {
         return useReactTable({

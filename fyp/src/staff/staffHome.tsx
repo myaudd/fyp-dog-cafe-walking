@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabaseClient";
-// import "./staffHome.css";
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import "./staffHome.css";
 
 type BookingType = "residentdog" | "staff";
 type BookingStatus = "Walking" | "Approved";
@@ -19,10 +20,12 @@ type Booking = {
 };
 
 const statuses: BookingStatus[] = ["Walking", "Approved"];
+const columnHelper = createColumnHelper<Booking>();
 
 const StaffHome = () => {
     const navigate = useNavigate();
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [search, setSearch] = useState("");
     const [sort, setSort] = useState<"desc" | "asc">("desc");
     const [selectedTypes, setSelectedTypes] = useState<BookingType[]>([]);
     const [selectedStatuses, setSelectedStatuses] = useState<BookingStatus[]>([]);
@@ -136,18 +139,24 @@ const StaffHome = () => {
         );
     };
 
-    const filteredBookings = bookings
-        .filter(b =>
-            selectedTypes.length === 0 || selectedTypes.includes(b.bookingtype)
-        )
-        .filter(b =>
-            selectedStatuses.length === 0 || selectedStatuses.includes(b.bookingstatus as BookingStatus)
-        )
-        .sort((a, d) => {
-            const da = new Date(a.bookingdatetime).getTime();
-            const dd = new Date(d.bookingdatetime).getTime();
-            return sort === "desc" ? dd - da : da - dd;
-        });
+    const filteredBookings = useMemo(() => {
+        return [...bookings]
+            .filter(b =>
+                search === "" ||
+                b.subjectname.toLowerCase().includes(search.toLowerCase())
+            )
+            .filter(b =>
+                selectedTypes.length === 0 || selectedTypes.includes(b.bookingtype)
+            )
+            .filter(b =>
+                selectedStatuses.length === 0 || selectedStatuses.includes(b.bookingstatus as BookingStatus)
+            )
+            .sort((a, d) => {
+                const da = new Date(a.bookingdatetime).getTime();
+                const dd = new Date(d.bookingdatetime).getTime();
+                return sort === "desc" ? dd - da : da - dd;
+            });
+    }, [bookings, selectedTypes, selectedStatuses, sort, search]);
 
     const formatDateTime = (dt: string) => {
         if(!dt) return "-";
@@ -159,6 +168,50 @@ const StaffHome = () => {
             minute: "2-digit",
         });
     };
+
+    const getStatusClass = (bookingstatus: string) => {
+        switch (bookingstatus?.toLowerCase()) {
+            case "approved": return "status-approved";
+            case "walking": return "status-walking";
+            default: return "";
+        }
+    };
+
+    const columns = useMemo(() => [
+        columnHelper.accessor("customername", {
+            header: "Customer",
+        }),
+
+        columnHelper.accessor("subjectname", {
+            header: "Name",
+        }),
+
+        columnHelper.accessor("bookingdatetime", {
+            header: "Date & Time",
+            cell: info => formatDateTime(info.getValue()),
+        }),
+
+        columnHelper.accessor("bookingplace", {
+            header: "Place",
+        }),
+
+        columnHelper.accessor("bookingstatus", {
+            header: "Status",
+            cell: info => (
+                <span className={getStatusClass(info.getValue())}>
+                    {info.getValue()}
+                </span>
+            ),
+        }),
+    ], [formatDateTime, getStatusClass]);
+
+    const table = useMemo(() => {
+        return useReactTable({
+            data: filteredBookings,
+            columns,
+            getCoreRowModel: getCoreRowModel(),
+        });
+    }, [filteredBookings, columns]);
 
     const goToTimer = (id: string, type: BookingType) => {
         navigate(`/timer/${type}/${id}`);
@@ -198,6 +251,15 @@ const StaffHome = () => {
                 </button> 
             </div>
 
+            <div className="search-bar">
+                <input
+                    type="text"
+                    placeholder="Search name..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+            </div>
+
             <div className="content">
                 <div className="filter">
                     <p>Sort by date</p>
@@ -231,7 +293,54 @@ const StaffHome = () => {
                     ))}
                 </div>
 
-                <div className="booking-list">
+                <div className="assigned-table-container">
+                    {filteredBookings.length === 0 ? (
+                        <p>No walking record found.</p>
+                    ) : (
+                        <table className="assigned-table">
+                            <thead>
+                                {table.getHeaderGroups().map(headerGroup => (
+                                    <tr key={headerGroup.id}>
+                                        {headerGroup.headers.map(header => (
+                                            <th key={header.id}>
+                                                {flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </thead>
+
+                            <tbody>
+                                {table.getRowModel().rows.map(row => (
+                                    <tr
+                                        key={row.id}
+                                        onClick={() =>
+                                            goToTimer(
+                                                row.original.bookingid,
+                                                row.original.bookingtype
+                                            )
+                                        }
+                                        style={{ cursor: "pointer"}}
+                                    >
+                                        {row.getVisibleCells().map(cell => (
+                                            <td key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+
+                {/* <div className="booking-list">
                     {filteredBookings.length === 0 && (
                         <p>No booking records found.</p>
                     )}
@@ -247,7 +356,7 @@ const StaffHome = () => {
                             </div>
                         </div>
                     ))}
-                </div>
+                </div> */}
             </div>
         </div>
     );

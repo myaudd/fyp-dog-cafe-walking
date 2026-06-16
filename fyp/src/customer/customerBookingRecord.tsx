@@ -168,8 +168,7 @@ const CustomerBookingRecord = () => {
         }
     };
 
-    const columns = useMemo(
-        () => [
+    const columns = useMemo(() => [
         columnHelper.accessor("bookingtype", {
             header: "Type",
             cell: info =>
@@ -193,9 +192,7 @@ const CustomerBookingRecord = () => {
                 </span>
             ),
         }),
-        ],
-    [formatDateTime, getStatusClass]
-    );
+    ], [formatDateTime, getStatusClass]);
 
     const table = useMemo(() => {
         return useReactTable({
