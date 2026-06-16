@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabaseClient";
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import "./staffManageBooking.css";
 
 type BookingType = "residentdog" | "staff";
 
@@ -16,6 +18,7 @@ type Booking = {
     bookingstatus: string;
 };
 
+const columnHelper = createColumnHelper<Booking>();
 
 const StaffManageBooking = () => {
     const navigate = useNavigate();
@@ -121,15 +124,17 @@ const StaffManageBooking = () => {
         );
     };
 
-    const filteredBookings = bookings
-        .filter(b =>
-            selectedTypes.length === 0 || selectedTypes.includes(b.bookingtype)
-        )
-        .sort((a, d) => {
-            const da = new Date(a.bookingdatetime).getTime();
-            const dd = new Date(d.bookingdatetime).getTime();
-            return sort === "desc" ? dd - da : da - dd;
-        });
+    const filteredBookings = useMemo(() => {
+        return [...bookings]
+            .filter(b =>
+                selectedTypes.length === 0 || selectedTypes.includes(b.bookingtype)
+            )
+            .sort((a, d) => {
+                const da = new Date(a.bookingdatetime).getTime();
+                const dd = new Date(d.bookingdatetime).getTime();
+                return sort === "desc" ? dd - da : da - dd;
+            });
+    }, [bookings, selectedTypes, sort]);
 
     const formatDateTime = (dt: string) => {
         if (!dt) return "-";
@@ -164,10 +169,71 @@ const StaffManageBooking = () => {
             error = result.error;
         }
         
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
         setBookings(prev =>
             prev.filter(b => b.bookingid !== booking.bookingid)
         );
     ;}
+
+    const columns = useMemo(() => {
+        const cols = [];
+
+        if (role === "Manager") {
+            cols.push(
+                columnHelper.accessor("bookingtype", {
+                    header: "Type",
+                    cell: info =>
+                        info.getValue() === "residentdog" ? "Resident Dog" : "Staff",
+                })
+            );
+        }
+
+        cols.push(
+            columnHelper.accessor("subjectname", {
+                header: "Name",
+            }),
+
+            columnHelper.accessor("bookingdatetime", {
+                header: "Date & Time",
+                cell: info => formatDateTime(info.getValue()),
+            }),
+
+            columnHelper.accessor("bookingplace", {
+                header: "Place",
+            }),
+
+            columnHelper.display({
+                id: "status",
+                header: "Status",
+                cell: ({row}) => (
+                    <select className="status-option"
+                        value="Pending"
+                        onChange={(e) =>
+                            updateBookingStatus(row.original, e.target.value as "Approved" | "Rejected")
+                        }
+                    >
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approve</option>
+                        <option value="Rejected">Reject</option>
+                    </select>
+                ),
+            }),
+        );
+
+        return cols;
+    }, [formatDateTime, role, updateBookingStatus]);
+
+    const table = useMemo(() => {
+        return useReactTable({
+            data: filteredBookings,
+            columns,
+            getCoreRowModel: getCoreRowModel(),
+        });
+    }, [filteredBookings, columns]);
 
     return (
         <div className="container">
@@ -227,43 +293,43 @@ const StaffManageBooking = () => {
                         </div>
                     )}
                 </div>
-                <div className="pending-list">
-                    {filteredBookings.length === 0 && (
-                        <p>No pending booking found.</p>
+
+                <div className="manage-table-container">
+                    {filteredBookings.length === 0 ? (
+                        <p>No pending bookings.</p>
+                    ) : (
+                        <table className="manage-table">
+                            <thead>
+                                {table.getHeaderGroups().map(headerGroup => (
+                                    <tr key={headerGroup.id}>
+                                        {headerGroup.headers.map(header => (
+                                            <th  key={header.id}>
+                                                {flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </thead>
+
+                            <tbody>
+                                {table.getRowModel().rows.map(row => (
+                                    <tr key={row.id}>
+                                        {row.getVisibleCells().map(cell => (
+                                            <td key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     )}
-
-                    {filteredBookings.map(bookings => (
-                        <div key={bookings.bookingid} className="pending-card">
-                            <div className="pending-info">
-                                <div className="label">
-                                    {role === "Manager" && (
-                                        <p>Type</p>
-                                    )}
-                                    <p>Name</p>
-                                    <p>Date &amp; Time</p>
-                                    <p>Place</p>
-                                </div>
-
-                                <div className="value">
-                                    {role === "Manager" && (
-                                        <p>{bookings.bookingtype === "residentdog" ? "Resident Dog" : "Staff"}</p>
-                                    )}
-                                    <p>{bookings.subjectname}</p>
-                                    <p>{formatDateTime(bookings.bookingdatetime)}</p>
-                                    <p>{bookings.bookingplace}</p>
-
-                                    <div className="action-button">
-                                        <button onClick={() => updateBookingStatus(bookings, "Approved")}>
-                                            Approve
-                                        </button>
-                                        <button onClick={() => updateBookingStatus(bookings, "Rejected")}>
-                                            Reject
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
                 </div>
             </div>
         </div>
