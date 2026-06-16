@@ -26,6 +26,7 @@ const CustomerBookingRecord = () => {
 
     const [bookings, setBookings] = useState<Booking[]>([]);
     // const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
     const [sort, setSort] = useState<"desc" | "asc">("desc");
     const [selectedTypes, setSelectedTypes] = useState<BookingType[]>([]);
     const [selectedStatuses, setSelectedStatuses] = useState<BookingStatus[]>([]);
@@ -130,6 +131,10 @@ const CustomerBookingRecord = () => {
     
     const filteredBookings = useMemo(() => {
         return [...bookings]
+            .filter(b =>
+                search === "" ||
+                b.subjectname.toLowerCase().includes(search.toLowerCase())
+            )
             .filter(b => 
                 selectedTypes.length === 0 || selectedTypes.includes(b.bookingtype)
             )
@@ -141,7 +146,7 @@ const CustomerBookingRecord = () => {
                 const db = new Date(b.bookingdatetime).getTime();
                 return sort === "desc" ? db - da : da - db;
             });
-    }, [bookings, selectedTypes, selectedStatuses, sort]);
+    }, [bookings, selectedTypes, selectedStatuses, sort, search]);
 
     const formatDateTime = (dt: string) => {
         if (!dt) return "-";
@@ -229,6 +234,15 @@ const CustomerBookingRecord = () => {
                 <button onClick={() => navigate("/customer/walkingRecord")}>
                     Walking record
                 </button>
+            </div>
+
+            <div className="search-bar">
+                <input
+                    type="text"
+                    placeholder="Search name..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
             </div>
 
             <div className="content">

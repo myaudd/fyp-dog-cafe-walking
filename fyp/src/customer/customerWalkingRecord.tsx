@@ -27,6 +27,7 @@ const columnHelper = createColumnHelper<Walking>();
 const CustomerWalkingRecord = () => {
     const navigate = useNavigate();
     const [walkings, setWalkings] = useState<Walking[]>([]);
+    const [search, setSearch] = useState("");
     const [sort, setSort] = useState<"desc" | "asc">("desc");
     const [selectedTypes, setSelectedTypes] = useState<WalkingType[]>([]);
     const [selectedStatuses, setSelectedStatuses] = useState<WalkingStatus[]>([]);
@@ -137,6 +138,10 @@ const CustomerWalkingRecord = () => {
     const filteredWalkings = useMemo(() => {
         return [...walkings]
             .filter(w =>
+                search === "" ||
+                w.subjectname.toLowerCase().includes(search.toLowerCase())
+            )
+            .filter(w =>
                 selectedTypes.length === 0 || selectedTypes.includes(w.walkingtype)
             )
             .filter(w =>
@@ -147,7 +152,7 @@ const CustomerWalkingRecord = () => {
                 const dd = new Date(d.walkingdatetime).getTime();
                 return sort === "desc" ? dd - da : da - dd;
             });
-    }, [walkings, selectedTypes, selectedStatuses, sort]);
+    }, [walkings, selectedTypes, selectedStatuses, sort, search]);
 
     const formatDateTime = (datetime: string) => {
         if (!datetime) return "-";
@@ -257,6 +262,15 @@ const CustomerWalkingRecord = () => {
                 >
                     Walking record
                 </button>
+            </div>
+
+            <div className="search-bar">
+                <input
+                    type="text"
+                    placeholder="Search name..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)} //target -> search bar
+                />
             </div>
 
             <div className="content">
