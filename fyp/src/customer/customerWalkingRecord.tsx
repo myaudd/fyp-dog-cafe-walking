@@ -314,7 +314,16 @@ const CustomerWalkingRecord = () => {
 
                             <tbody>
                                 {table.getRowModel().rows.map(row => (
-                                    <tr key={row.id}>
+                                    <tr 
+                                        key={row.id}
+                                        onClick={() =>
+                                            goToWalking(
+                                                row.original.walkingid,
+                                                row.original.walkingtype
+                                            )
+                                        }
+                                        style={{ cursor: "pointer"}}
+                                    >
                                         {row.getVisibleCells().map(cell => (
                                             <td key={cell.id}>
                                                 {flexRender(
@@ -329,40 +338,6 @@ const CustomerWalkingRecord = () => {
                         </table>
                     )}
                 </div>
-
-                {/* <div className="walking-list">
-                    {filteredWalkings.length === 0 && (
-                        <p>No walking records found.</p>
-                    )}
-
-                    {filteredWalkings.map(walkings => (
-                        <div key={walkings.walkingid} className="walking-card" onClick={() => goToWalking(walkings.walkingid, walkings.walkingtype)}>
-                            <div className="walking-info">
-                                <div className="label">
-                                    <p>Type</p>
-                                    <p>Name</p>
-                                    <p>Date &amp; Time</p>
-                                    {walkings.walkingstatus === "Completed" && (
-                                        <p>Duration</p>
-                                    )}
-                                    <p>Status</p>
-                                </div>
-
-                                <div className="value">
-                                    <p>{walkings.walkingtype === "residentdog" ? "Resident Dog" : "Staff"}</p>
-                                    <p>{walkings.subjectname}</p>
-                                    <p>{formatDateTime(walkings.walkingdatetime)}</p>
-                                    {walkings.walkingstatus === "Completed" && (
-                                        <p>{formatDuration(walkings.walkingduration)}</p>
-                                    )}
-                                    <p>{walkings.walkingstatus}</p>
-                                </div>
-                            </div>
-
-                        </div>
-                    ))}
-                </div> */}
-
             </div>
         </div>
     );
