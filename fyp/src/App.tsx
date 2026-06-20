@@ -18,6 +18,8 @@ import StaffManageBooking from "./staff/staffManageBooking";
 import StaffManageProfile from "./staff/staffManageProfile";
 import AddDog from "./staff/addDog";
 import AddStaff from "./staff/addStaff";
+import EditStaff from "./staff/editStaff";
+import EditDog from "./staff/editDog";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -65,6 +67,8 @@ function App() {
       <Route path="/staff/staffManageProfile" element={<StaffManageProfile />} />
       <Route path="/addDog" element={<AddDog />} />
       <Route path="/addStaff" element={<AddStaff />} />
+      <Route path="/editDog/:id" element={<EditDog />} />
+      <Route path="/editStaff/:id" element={<EditStaff />} />
 
     </Routes>
   );
