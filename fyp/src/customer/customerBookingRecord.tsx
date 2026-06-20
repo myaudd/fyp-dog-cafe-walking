@@ -6,7 +6,7 @@ import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "
 import "./customerBookingRecord.css";
 
 type BookingType = "residentdog" | "staff";
-type BookingStatus = "Approved" | "Pending";
+type BookingStatus = "Approved" | "Pending" | "Walking";
 
 type Booking = {
     bookingid: string;
@@ -18,7 +18,7 @@ type Booking = {
     bookingstatus: string;
 };
 
-const statuses: BookingStatus[] = ["Approved", "Pending"];
+const statuses: BookingStatus[] = ["Approved", "Pending", "Walking"];
 const columnHelper = createColumnHelper<Booking>();
 
 const CustomerBookingRecord = () => {
@@ -59,7 +59,7 @@ const CustomerBookingRecord = () => {
                         )
                     `)
                     .eq("customerid", customer.customerid)
-                    .in("brdstatus", ["Approved", "Pending"]),
+                    .in("brdstatus", ["Approved", "Pending", "Walking"]),
                 supabase
                     .from("bookingstaff")
                     .select(`
@@ -73,7 +73,7 @@ const CustomerBookingRecord = () => {
                         )
                     `)
                     .eq("customerid", customer.customerid)
-                    .in("bsstatus", ["Approved", "Pending"]),
+                    .in("bsstatus", ["Approved", "Pending", "Walking"]),
             ]);
 
             const combinedBooking: Booking[] = [];
@@ -164,6 +164,7 @@ const CustomerBookingRecord = () => {
         switch (bookingstatus?.toLowerCase()) {
             case "approved": return "status-approved";
             case "pending": return "status-pending";
+            case "walking": return "status-walking";
             default: return "";
         }
     };

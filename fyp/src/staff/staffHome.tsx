@@ -240,9 +240,6 @@ const StaffHome = () => {
                 <button onClick={() => navigate("/staff/staffManageBooking")}>
                     Manage Booking
                 </button>
-                <button onClick={() => navigate("/staff/staffBookingRecord")}>
-                    Booking record
-                </button>
                 <button onClick={() => navigate("/staff/staffWalkingRecord")}>
                     Walking record
                 </button>
@@ -339,24 +336,6 @@ const StaffHome = () => {
                         </table>
                     )}
                 </div>
-
-                {/* <div className="booking-list">
-                    {filteredBookings.length === 0 && (
-                        <p>No booking records found.</p>
-                    )}
-
-                    {filteredBookings.map(bookings => (
-                        <div key={bookings.bookingid} className="booking-card" onClick={() => goToTimer(bookings.bookingid, bookings.bookingtype)}>
-                            <div className="detail">
-                                <p>Customer name: {bookings.customername}</p>
-                                <p>Subject name: {bookings.subjectname}</p>
-                                <p>Date & time: {formatDateTime(bookings.bookingdatetime)}</p>
-                                <p>Place: {bookings.bookingplace}</p>
-                                <p>Status: {bookings.bookingstatus}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div> */}
             </div>
         </div>
     );
