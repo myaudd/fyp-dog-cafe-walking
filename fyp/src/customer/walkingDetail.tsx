@@ -1,11 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
-import "./customerWalkingDetail.css";
+import "./walkingDetail.css";
 
 type WalkingType = "residentdog" | "staff";
 
 type Walking = {
+    customerid: string;
+    customername: string;
     walkingid: string;
     walkingtype: WalkingType;
     subjectid: string;
@@ -18,7 +20,7 @@ type Walking = {
     walkingrating: number | null;
 };
 
-const CustomerWalkingDetail = () => {
+const WalkingDetail = () => {
     const navigate = useNavigate();
     const { type, id } = useParams(); 
     const [walking, setWalking] = useState<Walking | null>(null);
@@ -29,6 +31,12 @@ const CustomerWalkingDetail = () => {
     const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [photoDesc, setPhotoDesc] = useState("");
     const [photos, setPhotos] = useState<any[]>([]);
+
+    const storedUser = localStorage.getItem("user");
+    const user = storedUser ? JSON.parse(storedUser) : null;
+
+    const isCustomer = user.role === "customer";
+    const isStaff = user.role === "staff";
 
     useEffect(() => {
         const fetchPhotos = async () => {
@@ -53,6 +61,10 @@ const CustomerWalkingDetail = () => {
                 const { data, error } = await supabase
                     .from("bookingresidentdog")
                     .select(`
+                        customer (
+                            customerid,
+                            customername
+                        ),
                         brdid,
                         residentdog (
                             residentdogid,
@@ -73,7 +85,12 @@ const CustomerWalkingDetail = () => {
                 const dog = Array.isArray(data.residentdog)
                 ? data.residentdog[0]
                 : data.residentdog;
+                const customer = Array.isArray(data.customer)
+                ? data.customer[0]
+                : data.customer;
                 setWalking({
+                    customerid: customer?.customerid ?? "",
+                    customername: customer?.customername ?? "Unknown",
                     walkingid: data.brdid,
                     walkingtype: "residentdog",
                     subjectid: dog?.residentdogid ?? "",
@@ -90,6 +107,10 @@ const CustomerWalkingDetail = () => {
                 const { data, error } = await supabase
                     .from("bookingstaff")
                     .select(`
+                        customer (
+                            customerid,
+                            customername
+                        ),
                         bsid,
                         staff (
                             staffid,
@@ -111,7 +132,12 @@ const CustomerWalkingDetail = () => {
                 const staff = Array.isArray(data.staff)
                 ? data.staff[0]
                 : data.staff;
+                const customer = Array.isArray(data.customer)
+                ? data.customer[0]
+                : data.customer;
                 setWalking({
+                    customerid: customer?.customerid ?? "",
+                    customername: customer?.customername ?? "Unknown",
                     walkingid: data.bsid,
                     walkingtype: "staff",
                     subjectid: staff?.staffid ?? "",
@@ -131,6 +157,7 @@ const CustomerWalkingDetail = () => {
     }, [type, id]);
 
     const handleSubmitRating = async (value: number) => {
+        if (isStaff) return;
         if (!id || type !== "staff") return;
         if (rated) return;
     
@@ -153,6 +180,7 @@ const CustomerWalkingDetail = () => {
     };
     
     const handleUploadPhoto = async () => {
+        if (isStaff) return;
         if (!photoFile || !id || type !== "residentdog") return;
     
         try {
@@ -232,6 +260,9 @@ const CustomerWalkingDetail = () => {
 
     return (
         <div className="container">
+            {isStaff &&
+                <p>Customer name: {walking?.customername}</p>
+            }
             <p>Walking type: {walking?.walkingtype === "residentdog" ? "resident dog" : "staff"}</p>
             <p>Subject: {walking?.subjectname}</p>
             <p>Data & Time: {formatDateTime(walking?.walkingdatetime)}</p>
@@ -240,7 +271,7 @@ const CustomerWalkingDetail = () => {
             <p>Duration: {formatDuration(walking?.walkingduration)}</p>
             <p>Place: {walking?.walkingplace}</p>
 
-            {type === "residentdog" && (
+            {type === "residentdog" && isCustomer && (
                 <div>
                     <p>Upload Photo:</p>
 
@@ -288,9 +319,9 @@ const CustomerWalkingDetail = () => {
                     {[1, 2, 3, 4, 5].map((star) => (
                         <button
                             key={star}
-                            className="star-btn"
+                            className={`star-btn ${isStaff ? "readonly" : ""}`}
                             onClick={() => handleSubmitRating(star)}
-                            disabled={walking?.walkingrating != null} //user can only rate once, no update
+                            disabled={isStaff || walking?.walkingrating != null} //user can only rate once, no update
                         >
                             {star <= (walking?.walkingrating ?? 0) ? "★" : "☆"} 
                         </button> //loop and compare the star value
@@ -302,4 +333,4 @@ const CustomerWalkingDetail = () => {
     );
 }
 
-export default CustomerWalkingDetail;
+export default WalkingDetail;

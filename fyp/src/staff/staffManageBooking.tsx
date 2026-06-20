@@ -257,7 +257,7 @@ const StaffManageBooking = () => {
                     onClick={() => navigate("/staff/staffManageBooking")}>
                     Manage Booking
                 </button>
-                <button onClick={() => navigate("/staff/staffWalkingRecord")}>
+                <button onClick={() => navigate("/staff/walkingRecord")}>
                     Walking record
                 </button>
                 <button onClick={() => navigate("/staff/staffManageProfile")}>

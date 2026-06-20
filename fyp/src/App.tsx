@@ -9,8 +9,8 @@ import BookResidentDog from "./customer/bookResidentDog";
 import AvailableStaff from "./customer/availableStaff";
 import BookStaff from "./customer/bookStaff";
 import CustomerBookingRecord from "./customer/customerBookingRecord";
-import CustomerWalkingRecord from "./customer/customerWalkingRecord";
-import CustomerWalkingDetail from "./customer/customerWalkingDetail";
+import WalkingRecord from "./customer/walkingRecord";
+import WalkingDetail from "./customer/walkingDetail";
 import StaffHome from "./staff/staffHome";
 import StaffAssignedTimer from "./staff/staffAssignedTimer";
 import StaffProfile from "./staff/staffProfile";
@@ -52,8 +52,9 @@ function App() {
       {/* /:..../ -> a variable / parameter */}
       <Route path="/bookStaff/:staffId" element={<BookStaff />} />
       <Route path="/customer/bookingRecord" element={<CustomerBookingRecord />} />
-      <Route path="/customer/walkingRecord" element={<CustomerWalkingRecord />} />
-      <Route path="/walk/:type/:id" element={<CustomerWalkingDetail />} />
+      <Route path="/customer/walkingRecord" element={<WalkingRecord />} />
+      <Route path="/staff/walkingRecord" element={<WalkingRecord />} />
+      <Route path="/walk/:type/:id" element={<WalkingDetail />} />
       <Route path="/staff/staffHome" element={<StaffHome />} />
       <Route path="/timer/:type/:id" element={<StaffAssignedTimer />} />
       <Route path="/staff/staffProfile" element={<StaffProfile />} />

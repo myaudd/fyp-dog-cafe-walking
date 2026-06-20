@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabaseClient";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import "./customerWalkingRecord.css";
+import "./walkingRecord.css";
 
 type WalkingType = "residentdog" | "staff";
 type WalkingStatus = "Completed" | "Rejected" | "Invalid";
@@ -11,70 +11,78 @@ type Walking = {
     walkingid: string;
     walkingtype: WalkingType;
     customerid: string;
+    customername: string;
     subjectid: string;
     subjectname: string;
     walkingdatetime: string;
     walkingduration: string;
     walkingstatus: string;
-    // walkingphoto: string | null;
-    // walkingrating: number | null;
 };
 
 const statuses: WalkingStatus[] = ["Completed", "Rejected", "Invalid"];
 const columnHelper = createColumnHelper<Walking>();
 
-const CustomerWalkingRecord = () => {
+const WalkingRecord = () => {
     const navigate = useNavigate();
     const [walkings, setWalkings] = useState<Walking[]>([]);
     const [search, setSearch] = useState("");
     const [sort, setSort] = useState<"desc" | "asc">("desc");
     const [selectedTypes, setSelectedTypes] = useState<WalkingType[]>([]);
     const [selectedStatuses, setSelectedStatuses] = useState<WalkingStatus[]>([]);
+    
+    const storedUser = localStorage.getItem("user");
+    const user = storedUser ? JSON.parse(storedUser) : null;
+
+    const isCustomer = user.role === "customer";
+    const isStaff = user.role === "staff";
 
     useEffect(() => {
         const fetchWalkings = async () => {
-            const storedUser = localStorage.getItem("user");
 
             if(!storedUser) return;
 
-            const user = JSON.parse(storedUser);
-
-            if(user.role !== "customer") return;
-
-            const customer = user.data;
-
-            const [brd, bs] = await Promise.all([
-                supabase
-                    .from("bookingresidentdog")
-                    .select(`
-                        brdid,
+            let brdQuery = supabase
+                .from("bookingresidentdog")
+                .select(`
+                    brdid,
+                    customer (
                         customerid,
-                        brddatetime,
-                        brdduration,
-                        residentdog (
-                            residentdogid,
-                            residentdogname
-                        ),
-                        brdstatus
-                    `)
-                    .eq("customerid", customer.customerid)
-                    .in("brdstatus", ["Completed", "Rejected", "Invalid"]),
-                supabase
-                    .from("bookingstaff")
-                    .select(`
-                        bsid,
+                        customername
+                    ),
+                    brddatetime,
+                    brdduration,
+                    residentdog (
+                        residentdogid,
+                        residentdogname
+                    ),
+                    brdstatus
+                `)
+                .in("brdstatus", ["Completed", "Rejected", "Invalid"]);
+            
+            let bsQuery = supabase
+                .from("bookingstaff")
+                .select(`
+                    bsid,
+                    customer (
                         customerid,
-                        bsdatetime,
-                        bsduration,
-                        staff (
-                            staffid,
-                            staffname
-                        ),
-                        bsstatus
-                    `)
-                    .eq("customerid", customer.customerid)
-                    .in("bsstatus", ["Completed", "Rejected", "Invalid"]),
-            ]);
+                        customername
+                    ),
+                    bsdatetime,
+                    bsduration,
+                    staff (
+                        staffid,
+                        staffname
+                    ),
+                    bsstatus
+                `)
+                .in("bsstatus", ["Completed", "Rejected", "Invalid"]);
+
+            if (isCustomer) {
+                brdQuery = brdQuery.eq("customerid", user.data.customerid);
+                bsQuery = bsQuery.eq("customerid", user.data.customerid);
+            }
+
+            const [brd, bs] = await Promise.all([brdQuery, bsQuery]);
 
             const combinedWalking: Walking[] = [];
 
@@ -83,13 +91,12 @@ const CustomerWalkingRecord = () => {
                     combinedWalking.push({
                         walkingid: row.brdid,
                         walkingtype: "residentdog",
-                        customerid: row.customerid,
+                        customerid: row.customer?.customerid ?? "",
+                        customername: row.customer?.customername ?? "Unknown",
                         subjectid: row.residentdog?.residentdogid ?? "",
                         subjectname: row.residentdog?.residentdogname ?? "Unknown",
                         walkingdatetime: row.brddatetime,
                         walkingduration: row.brdduration,
-                        // walkingphoto: row.photo?.photourl ?? null,
-                        // walkingrating: null,
                         walkingstatus: row.brdstatus,
                     });
                 });   
@@ -100,13 +107,12 @@ const CustomerWalkingRecord = () => {
                     combinedWalking.push({
                         walkingid: row.bsid,
                         walkingtype: "staff",
-                        customerid: row.customerid,
+                        customerid: row.customer?.customerid ?? "",
+                        customername: row.customer?.customername ?? "Unknown",
                         subjectid: row.staff?.staffid ?? "",
                         subjectname: row.staff?.staffname ?? "Unknown",
                         walkingdatetime: row.bsdatetime,
                         walkingduration: row.bsduration,
-                        // walkingphoto: null,
-                        // walkingrating: row.bsrate ?? null,
                         walkingstatus: row.bsstatus,
                     });
                 });
@@ -138,7 +144,8 @@ const CustomerWalkingRecord = () => {
         return [...walkings]
             .filter(w =>
                 search === "" ||
-                w.subjectname.toLowerCase().includes(search.toLowerCase())
+                w.subjectname.toLowerCase().includes(search.toLowerCase()) ||
+                w.customername.toLowerCase().includes(search.toLowerCase())
             )
             .filter(w =>
                 selectedTypes.length === 0 || selectedTypes.includes(w.walkingtype)
@@ -186,36 +193,50 @@ const CustomerWalkingRecord = () => {
         }
     };
 
-    const columns = useMemo(() => [
-        columnHelper.accessor("walkingtype", {
-            header: "Type",
-            cell: info => 
-                info.getValue() === "residentdog" ? "Resident Dog" : "Staff",
-        }),
+    const columns = useMemo(() => {
+        const cols: any[] = [];
 
-        columnHelper.accessor("subjectname", {
-            header: "Name",
-        }),
+        if (isStaff) {
+            cols.push(
+                columnHelper.accessor("customername", {
+                    header: "Customer",
+                })
+            );
+        }
 
-        columnHelper.accessor("walkingdatetime", {
-            header: "Date & Time",
-            cell: info => formatDateTime(info.getValue()),
-        }),
+        cols.push(
+            columnHelper.accessor("walkingtype", {
+                header: "Type",
+                cell: info => 
+                    info.getValue() === "residentdog" ? "Resident Dog" : "Staff",
+            }),
 
-        columnHelper.accessor("walkingstatus", {
-            header: "Status",
-            cell: info => (
-                <span className={getStatusClass(info.getValue())}>
-                    {info.getValue()}
-                </span>
-            ),
-        }),
+            columnHelper.accessor("subjectname", {
+                header: "Name",
+            }),
 
-        columnHelper.accessor("walkingduration", {
-            header: "Duration",
-            cell: info => formatDuration(info.getValue()),
-        }),
-    ], [formatDateTime, formatDuration, getStatusClass]);
+            columnHelper.accessor("walkingdatetime", {
+                header: "Date & Time",
+                cell: info => formatDateTime(info.getValue()),
+            }),
+
+            columnHelper.accessor("walkingstatus", {
+                header: "Status",
+                cell: info => (
+                    <span className={getStatusClass(info.getValue())}>
+                        {info.getValue()}
+                    </span>
+                ),
+            }),
+
+            columnHelper.accessor("walkingduration", {
+                header: "Duration",
+                cell: info => formatDuration(info.getValue()),
+            }),
+        );
+
+        return cols;
+    }, [isStaff, formatDateTime, formatDuration, getStatusClass]);
 
     const table = useMemo(() => {
         return useReactTable({
@@ -235,13 +256,14 @@ const CustomerWalkingRecord = () => {
                 <button
                     type="button"
                     className="profile-icon"
-                    onClick={() => navigate("/customer/customerProfile")}
+                    onClick={() => navigate(isStaff ? "/staff/staffProfile" : "/customer/customerProfile")}
                     aria-label="Profile"
                 >
                     👤
                 </button>
             </header>
 
+            {isCustomer && 
             <div className="menu-bar">
                 <button onClick={() => navigate("/customer/customerHome")}>
                     Available dog
@@ -259,6 +281,27 @@ const CustomerWalkingRecord = () => {
                     Walking record
                 </button>
             </div>
+            }
+
+            {isStaff && 
+                <div className="menu-bar">
+                <button onClick={() => navigate("/staff/staffHome")}>
+                    Assigned Walking
+                </button>
+                <button onClick={() => navigate("/staff/staffManageBooking")}>
+                    Manage Booking
+                </button>
+                <button 
+                    className="active"
+                    onClick={() => navigate("/staff/walkingRecord")}
+                >
+                    Walking Record
+                </button>
+                <button onClick={() => navigate("/staff/staffManageProfile")}>
+                    Manage Profile
+                </button>
+                </div>
+            }
 
             <div className="search-bar">
                 <input
@@ -353,4 +396,4 @@ const CustomerWalkingRecord = () => {
     );
 };
 
-export default CustomerWalkingRecord;
+export default WalkingRecord;
