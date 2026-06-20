@@ -33,8 +33,9 @@ const WalkingRecord = () => {
     const storedUser = localStorage.getItem("user");
     const user = storedUser ? JSON.parse(storedUser) : null;
 
-    const isCustomer = user.role === "customer";
-    const isStaff = user.role === "staff";
+    const isCustomer = user?.role === "customer";
+    const isStaff = user?.role === "staff";
+    const role = user?.data?.staffrole;
 
     useEffect(() => {
         const fetchWalkings = async () => {
@@ -297,9 +298,11 @@ const WalkingRecord = () => {
                 >
                     Walking Record
                 </button>
-                <button onClick={() => navigate("/staff/staffManageProfile")}>
-                    Manage Profile
-                </button>
+                {role === "Manager" && (
+                    <button onClick={() => navigate("/staff/staffManageProfile")}>
+                        Manage profile
+                    </button> 
+                )} 
                 </div>
             }
 

@@ -260,9 +260,11 @@ const StaffManageBooking = () => {
                 <button onClick={() => navigate("/staff/walkingRecord")}>
                     Walking record
                 </button>
-                <button onClick={() => navigate("/staff/staffManageProfile")}>
-                    Manage profile
-                </button> 
+                {role === "Manager" && (
+                    <button onClick={() => navigate("/staff/staffManageProfile")}>
+                        Manage profile
+                    </button> 
+                )}
             </div>
 
             <div className="content">

@@ -99,7 +99,7 @@ const EditDog = () => {
 
     return (
         <div className="container">
-            <h1>Add a New Dog</h1>
+            <h1>Profile</h1>
   
             <div className="form-group">
                 <label>Name</label>

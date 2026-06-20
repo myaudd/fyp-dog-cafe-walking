@@ -24,6 +24,7 @@ const columnHelper = createColumnHelper<Booking>();
 
 const StaffHome = () => {
     const navigate = useNavigate();
+    const [role, setRole] =useState("");
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [search, setSearch] = useState("");
     const [sort, setSort] = useState<"desc" | "asc">("desc");
@@ -38,6 +39,8 @@ const StaffHome = () => {
         const user = JSON.parse(storedUser);
 
         if (user.role !== "staff") return;
+
+        setRole(user.data.staffrole);
   
         const staff = user.data;
 
@@ -243,9 +246,11 @@ const StaffHome = () => {
                 <button onClick={() => navigate("/staff/walkingRecord")}>
                     Walking record
                 </button>
-                <button onClick={() => navigate("/staff/staffManageProfile")}>
-                    Manage profile
-                </button> 
+                {role === "Manager" && (
+                    <button onClick={() => navigate("/staff/staffManageProfile")}>
+                        Manage profile
+                    </button> 
+                )} 
             </div>
 
             <div className="search-bar">
