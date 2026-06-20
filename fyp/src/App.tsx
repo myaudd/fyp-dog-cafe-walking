@@ -16,6 +16,8 @@ import StaffAssignedTimer from "./staff/staffAssignedTimer";
 import StaffProfile from "./staff/staffProfile";
 import StaffManageBooking from "./staff/staffManageBooking";
 import StaffManageProfile from "./staff/staffManageProfile";
+import AddDog from "./staff/addDog";
+import AddStaff from "./staff/addStaff";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -61,6 +63,9 @@ function App() {
       <Route path="/staff/staffProfile" element={<StaffProfile />} />
       <Route path="/staff/staffManageBooking" element={<StaffManageBooking />} />
       <Route path="/staff/staffManageProfile" element={<StaffManageProfile />} />
+      <Route path="/addDog" element={<AddDog />} />
+      <Route path="/addStaff" element={<AddStaff />} />
+
     </Routes>
   );
 }

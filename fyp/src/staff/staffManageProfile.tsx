@@ -343,15 +343,18 @@ const StaffManageProfile = () => {
 
             <div className="content">
                 <div className="filter">
-                    <button 
-                        className="add"
-                        onClick={() => {
-                            tab === "residentdog" && goToAddDog() ||
-                            tab === "staff" && goToAddStaff() 
-                        }}
-                    >
-                        + Add
-                    </button>
+                    {tab !== "customer" &&
+                        <button 
+                            className="add"
+                            onClick={() => {
+                                tab === "residentdog" && goToAddDog() ||
+                                tab === "staff" && goToAddStaff() 
+                            }}
+                        >
+                            + Add
+                        </button>
+                    }
+                    
                     {tab === "residentdog" &&
                         <div>
                             <p>Sort by size</p>
