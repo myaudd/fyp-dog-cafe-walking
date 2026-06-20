@@ -15,6 +15,7 @@ import StaffHome from "./staff/staffHome";
 import StaffAssignedTimer from "./staff/staffAssignedTimer";
 import StaffProfile from "./staff/staffProfile";
 import StaffManageBooking from "./staff/staffManageBooking";
+import StaffManageProfile from "./staff/staffManageProfile";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ function App() {
       <Route path="/timer/:type/:id" element={<StaffAssignedTimer />} />
       <Route path="/staff/staffProfile" element={<StaffProfile />} />
       <Route path="/staff/staffManageBooking" element={<StaffManageBooking />} />
+      <Route path="/staff/staffManageProfile" element={<StaffManageProfile />} />
     </Routes>
   );
 }
